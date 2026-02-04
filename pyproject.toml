@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "starspring"
+version = "0.1.2"
+description = "A Spring Boot-inspired Python web framework built on Starlette"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Dasun Nethsara"}
+]
+keywords = ["web", "framework", "starlette", "spring-boot", "dependency-injection"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+
+dependencies = [
+    "starlette>=0.27.0",
+    "pydantic>=2.0.0",
+    "uvicorn[standard]>=0.23.0",
+    "python-multipart>=0.0.6",
+    "pyyaml>=6.0",
+    "httpx>=0.24.0",
+    "jinja2>=3.1.6",
+    "sqlalchemy>=2.0.46",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.7.0",
+    "mypy>=1.5.0",
+]
+sqlalchemy = [
+    "sqlalchemy>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/DasunNethsara-04/starspring"
+Documentation = "https://github.com/DasunNethsara-04/starspring#readme"
+Repository = "https://github.com/DasunNethsara-04/starspring"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["starspring*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false

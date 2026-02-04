@@ -1,0 +1,191 @@
+Testing save operation...
+DEBUG: Scanning module examples.blog_app
+DEBUG: Current beans: []
+DEBUG: Registered route: /api/comments/{id}/approve -> ['PUT']
+DEBUG: Registered route: /api/comments -> ['POST']
+DEBUG: Registered route: /api/comments/post/{post_id} -> ['GET']
+DEBUG: Registered route: / -> ['GET']
+DEBUG: Registered route: /api/posts -> ['POST']
+DEBUG: Registered route: /api/posts/{id} -> ['DELETE']
+DEBUG: Registered route: /api/posts/{id} -> ['GET']
+DEBUG: Registered route: /api/posts -> ['GET']
+DEBUG: Registered route: /api/posts/{id}/publish -> ['PUT']
+DEBUG: Registered route: /posts -> ['GET']
+DEBUG: Registered route: /posts/{id} -> ['GET']
+DEBUG: Registered route: /api/users -> ['POST']
+DEBUG: Registered route: /api/users -> ['GET']
+DEBUG: Registered route: /api/users/{id} -> ['GET']
+DEBUG: Scanning module examples.blog_app
+DEBUG: Current beans: ['UserRepository', 'PostRepository', 'CommentRepository', 'TagRepository', 'UserService', 'PostService', 'CommentService', 'UserApiController', 'PostApiController', 'CommentApiController', 'HomeController', 'PostViewController']
+DEBUG: Registered route: /api/comments/{id}/approve -> ['PUT']
+DEBUG: Registered route: /api/comments -> ['POST']
+DEBUG: Registered route: /api/comments/post/{post_id} -> ['GET']
+DEBUG: Registered route: / -> ['GET']
+DEBUG: Registered route: /api/posts -> ['POST']
+DEBUG: Registered route: /api/posts/{id} -> ['DELETE']
+DEBUG: Registered route: /api/posts/{id} -> ['GET']
+DEBUG: Registered route: /api/posts -> ['GET']
+DEBUG: Registered route: /api/posts/{id}/publish -> ['PUT']
+DEBUG: Registered route: /posts -> ['GET']
+DEBUG: Registered route: /posts/{id} -> ['GET']
+DEBUG: Registered route: /api/users -> ['POST']
+DEBUG: Registered route: /api/users -> ['GET']
+DEBUG: Registered route: /api/users/{id} -> ['GET']
+2026-02-03 12:34:28,405 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-02-03 12:34:28,406 INFO sqlalchemy.engine.Engine 
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='comments'
+        
+2026-02-03 12:34:28,406 INFO sqlalchemy.engine.Engine [generated in 0.00021s] ()
+2026-02-03 12:34:28,407 INFO sqlalchemy.engine.Engine 
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='posts'
+        
+2026-02-03 12:34:28,407 INFO sqlalchemy.engine.Engine [generated in 0.00011s] ()
+2026-02-03 12:34:28,407 INFO sqlalchemy.engine.Engine 
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='users'
+        
+2026-02-03 12:34:28,407 INFO sqlalchemy.engine.Engine [generated in 0.00007s] ()
+2026-02-03 12:34:28,407 INFO sqlalchemy.engine.Engine 
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='tags'
+        
+2026-02-03 12:34:28,407 INFO sqlalchemy.engine.Engine [generated in 0.00008s] ()
+2026-02-03 12:34:28,408 INFO sqlalchemy.engine.Engine COMMIT
+2026-02-03 12:34:28,409 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-02-03 12:34:28,409 INFO sqlalchemy.engine.Engine 
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='comments'
+        
+2026-02-03 12:34:28,409 INFO sqlalchemy.engine.Engine [cached since 0.002892s ago] ()
+2026-02-03 12:34:28,409 INFO sqlalchemy.engine.Engine 
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='posts'
+        
+2026-02-03 12:34:28,409 INFO sqlalchemy.engine.Engine [cached since 0.002318s ago] ()
+2026-02-03 12:34:28,409 INFO sqlalchemy.engine.Engine 
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='users'
+        
+2026-02-03 12:34:28,409 INFO sqlalchemy.engine.Engine [cached since 0.002291s ago] ()
+2026-02-03 12:34:28,410 INFO sqlalchemy.engine.Engine 
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name='tags'
+        
+2026-02-03 12:34:28,410 INFO sqlalchemy.engine.Engine [cached since 0.002218s ago] ()
+2026-02-03 12:34:28,410 INFO sqlalchemy.engine.Engine COMMIT
+User object: {'email': 'test@example.com', 'username': 'testuser', 'name': 'Test User', 'active': True, 'created_at': datetime.datetime(2026, 2, 3, 12, 34, 28, 410332), 'updated_at': datetime.datetime(2026, 2, 3, 12, 34, 28, 410334)}
+2026-02-03 12:34:28,410 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-02-03 12:34:28,411 INFO sqlalchemy.engine.Engine INSERT INTO users (created_at, updated_at, email, username, name, bio, active) VALUES (?, ?, ?, ?, ?, ?, ?)
+2026-02-03 12:34:28,411 INFO sqlalchemy.engine.Engine [generated in 0.00015s] ('2026-02-03T12:34:28.410332', '2026-02-03T12:34:28.410334', 'test@example.com', 'testuser', 'Test User', <starspring.data.entity.ColumnMetadata object at 0x0000026CFC7967A0>, True)
+Traceback (most recent call last):
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.ProgrammingError: Error binding parameter 6: type 'ColumnMetadata' is not supported
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\projects\frameworks\by antigravity\test_simple_save.py", line 46, in test_save
+    saved_user = await user_repo.save(user)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\frameworks\by antigravity\starspring\data\repository.py", line 59, in save
+    return await self._gateway.save(entity)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\frameworks\by antigravity\starspring\data\orm_gateway.py", line 172, in save
+    result = self.session.execute(text(sql), params)
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\orm\session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\orm\session.py", line 2258, in _execute_internal
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\sql\elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\engine\default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.ProgrammingError: (sqlite3.ProgrammingError) Error binding parameter 6: type 'ColumnMetadata' is not supported
+[SQL: INSERT INTO users (created_at, updated_at, email, username, name, bio, active) VALUES (?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-02-03T12:34:28.410332', '2026-02-03T12:34:28.410334', 'test@example.com', 'testuser', 'Test User', <starspring.data.entity.ColumnMetadata object at 0x0000026CFC7967A0>, True)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\projects\frameworks\by antigravity\test_simple_save.py", line 54, in <module>
+    asyncio.run(test_save())
+    ~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "D:\projects\frameworks\by antigravity\test_simple_save.py", line 49, in test_save
+    print(f"\u274c Error: {e}")
+    ~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\techs\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u274c' in position 0: character maps to <undefined>

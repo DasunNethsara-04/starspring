@@ -1,0 +1,13 @@
+[project]
+name = "starspring"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic>=2.12.5",
+    "pyyaml>=6.0.3",
+    "starlette>=0.52.1",
+    "uvicorn>=0.40.0",
+]
