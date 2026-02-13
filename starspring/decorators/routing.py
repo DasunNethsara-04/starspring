@@ -112,8 +112,17 @@ def create_route_handler(bound_method: Callable) -> Callable:
                 (inspect.isclass(param_type) and issubclass(param_type, BaseModel))
             ):
                 try:
-                    body = await request.json()
-                    kwargs[param_name] = param_type(**body)
+                    # Try form data first (for HTML forms)
+                    content_type = request.headers.get("content-type", "")
+                    if "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type:
+                        form_data = await request.form()
+                        # Convert FormData to dict for Pydantic
+                        form_dict = {key: value for key, value in form_data.items()}
+                        kwargs[param_name] = param_type(**form_dict)
+                    else:
+                        # Fall back to JSON for API requests
+                        body = await request.json()
+                        kwargs[param_name] = param_type(**body)
                 except ValidationError as e:
                     raise ValidationException(
                         message="Validation failed",
@@ -179,7 +188,7 @@ def create_route_handler(bound_method: Callable) -> Callable:
         from starlette.responses import HTMLResponse
         if isinstance(result, ModelAndView):
             html_content = render_template(result.get_view_name(), result.get_model())
-            return HTMLResponse(content=html_content)
+            return HTMLResponse(content=html_content, status_code=result.get_status_code())
         
         # Convert ResponseEntity to Starlette response
         if isinstance(result, ResponseEntity):
