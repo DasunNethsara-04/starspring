@@ -7,8 +7,7 @@ name = "starspring"
 dynamic = ["version"]
 description = "A Spring Boot-inspired Python web framework built on Starlette, combining the elegance of Spring's dependency injection with Python's simplicity"
 readme = "README.md"
-license = "MIT"
-license-files = ["LICENSE"]
+license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
     { name = "Dasun Nethsara", email = "techsaralk.pro@gmail.com" },
@@ -61,6 +60,7 @@ dependencies = [
     "python-multipart>=0.0.18",
     "pyyaml>=6.0",
     "httpx>=0.24.0",
+    "pdm>=2.26.6",
 ]
 
 [project.urls]
@@ -156,10 +156,30 @@ version = { source = "file", path = "starspring/__init__.py" }
 distribution = true
 
 [tool.pdm.build]
+includes = [
+    "starspring/",
+]
+excludes = [
+    "**/.venv/",
+    "**/venv/",
+    "**/__pycache__/",
+    "**/*.pyc",
+    "**/*.pyo",
+    "**/.git/",
+    "**/.gitignore",
+    "**/.python-version",
+    "**/uv.lock",
+    "**/pyproject.toml",
+    "examples/",
+    "tests/",
+    "docs/",
+]
 source-includes = [
     "tests/",
     "examples/",
     "docs/",
+    "LICENSE",
+    "README.md",
 ]
 
 [tool.mypy]

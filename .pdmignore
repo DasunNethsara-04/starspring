@@ -1,0 +1,39 @@
+# Exclude virtual environments
+.venv/
+venv/
+env/
+
+# Exclude development files
+.git/
+.gitignore
+.python-version
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Exclude build artifacts
+dist/
+build/
+*.egg-info/
+
+# Exclude examples and tests
+examples/
+tests/
+
+# Exclude documentation source
+docs/
+
+# Exclude IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Exclude lock files
+uv.lock
+poetry.lock
+Pipfile.lock
