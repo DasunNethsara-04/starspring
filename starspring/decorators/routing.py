@@ -68,6 +68,24 @@ def create_route_handler(bound_method: Callable) -> Callable:
     func = bound_method.__func__ if hasattr(bound_method, '__func__') else bound_method
     
     async def handler(request: Request, **path_params):
+        # Handle method override for HTML forms
+        # HTML forms only support GET and POST, so we allow _method field to override
+        cached_form_data = None
+        if request.method == "POST":
+            try:
+                # Check if there's a _method field in form data
+                content_type = request.headers.get("content-type", "")
+                if "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type:
+                    # Read and cache form data (can only be read once)
+                    cached_form_data = await request.form()
+                    method_override = cached_form_data.get("_method")
+                    if method_override and method_override.upper() in ["PUT", "PATCH", "DELETE"]:
+                        # Override the request method
+                        request.scope["method"] = method_override.upper()
+            except Exception:
+                # If we can't read form data, continue with original method
+                pass
+        
         # Get function signature and type hints
         sig = inspect.signature(func)
         try:
@@ -115,9 +133,10 @@ def create_route_handler(bound_method: Callable) -> Callable:
                     # Try form data first (for HTML forms)
                     content_type = request.headers.get("content-type", "")
                     if "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type:
-                        form_data = await request.form()
-                        # Convert FormData to dict for Pydantic
-                        form_dict = {key: value for key, value in form_data.items()}
+                        # Use cached form data if available, otherwise read it
+                        form_data = cached_form_data if cached_form_data is not None else await request.form()
+                        # Convert FormData to dict for Pydantic (exclude _method field)
+                        form_dict = {key: value for key, value in form_data.items() if key != "_method"}
                         kwargs[param_name] = param_type(**form_dict)
                     else:
                         # Fall back to JSON for API requests
@@ -273,7 +292,7 @@ def PutMapping(path: str) -> Callable:
         def update_user(self, id: int, user: UserUpdateRequest):
             return updated_user
     """
-    return _create_route_decorator(path, ["PUT"])
+    return _create_route_decorator(path, ["PUT", "POST"])
 
 
 def DeleteMapping(path: str) -> Callable:
@@ -290,7 +309,7 @@ def DeleteMapping(path: str) -> Callable:
         def delete_user(self, id: int):
             return ResponseEntity.no_content()
     """
-    return _create_route_decorator(path, ["DELETE"])
+    return _create_route_decorator(path, ["DELETE", "POST"])
 
 
 def PatchMapping(path: str) -> Callable:
@@ -307,7 +326,7 @@ def PatchMapping(path: str) -> Callable:
         def patch_user(self, id: int, updates: dict):
             return patched_user
     """
-    return _create_route_decorator(path, ["PATCH"])
+    return _create_route_decorator(path, ["PATCH", "POST"])
 
 
 def RequestMapping(path: str, methods: Optional[List[str]] = None) -> Callable:
