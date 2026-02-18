@@ -14,6 +14,7 @@ A Spring Boot-inspired Python web framework built on Starlette, combining the el
 - [Building REST APIs](#building-rest-apis)
 - [Working with Templates](#working-with-templates)
 - [Middleware](#middleware)
+- [Security](#security)
 - [Advanced Features](#advanced-features)
 - [Examples](#examples)
 - [Contributing](#contributing)
@@ -35,7 +36,31 @@ StarSpring is ideal for developers who appreciate Spring Boot's structure but pr
 
 ---
 
-## What's New in v0.2.0 🎉
+## What's New in v0.2.2 🎉
+
+### starspring-security Integration
+Password hashing is now built into StarSpring via the companion [`starspring-security`](https://pypi.org/project/starspring-security/) package — automatically installed with StarSpring.
+
+```python
+from starspring_security import BCryptPasswordEncoder
+
+encoder = BCryptPasswordEncoder()
+hashed = encoder.encode("my_password")   # BCrypt hash
+encoder.matches("my_password", hashed)   # True
+```
+
+### Session-Based Authentication
+First-class support for session-based auth using Starlette's `SessionMiddleware`.
+
+```python
+from starlette.middleware.sessions import SessionMiddleware
+
+app.add_middleware(SessionMiddleware, secret_key="your-secret-key")
+```
+
+---
+
+## What's New in v0.2.0
 
 ### Automatic Form Data Parsing
 HTML forms are now automatically parsed into Pydantic models - no more manual `await request.form()`!
@@ -732,6 +757,138 @@ app._middleware.append(Middleware(CustomMiddleware))
 
 ---
 
+## Security
+
+### Password Hashing with `starspring-security`
+
+StarSpring ships with [`starspring-security`](https://pypi.org/project/starspring-security/) — a standalone password hashing library that works with any Python framework.
+
+#### BCrypt (Default — Recommended)
+
+```python
+from starspring_security import BCryptPasswordEncoder
+
+encoder = BCryptPasswordEncoder()           # Default: rounds=12
+encoder = BCryptPasswordEncoder(rounds=14)  # Stronger (slower)
+
+hashed = encoder.encode("my_password")
+encoder.matches("my_password", hashed)  # True
+encoder.matches("wrong", hashed)        # False
+```
+
+#### Argon2 (Modern, Memory-Hard)
+
+```bash
+pip install starspring-security[argon2]
+```
+
+```python
+from starspring_security import Argon2PasswordEncoder
+
+encoder = Argon2PasswordEncoder()
+hashed = encoder.encode("my_password")
+encoder.matches("my_password", hashed)  # True
+```
+
+#### SHA-256 (Deprecated ⚠️)
+
+```python
+from starspring_security import Sha256PasswordEncoder
+
+encoder = Sha256PasswordEncoder()  # Raises DeprecationWarning
+```
+
+SHA-256 is too fast for passwords and vulnerable to brute-force attacks. Use BCrypt or Argon2 instead.
+
+---
+
+### Session-Based Authentication
+
+StarSpring supports session-based authentication via Starlette's `SessionMiddleware`. Sessions are signed using `itsdangerous` — tamper-proof out of the box.
+
+#### Setup
+
+```python
+# main.py
+from starspring import StarSpringApplication
+from starlette.middleware.sessions import SessionMiddleware
+
+app = StarSpringApplication(title="My App")
+app.add_middleware(SessionMiddleware, secret_key="your-strong-secret-key")
+app.run()
+```
+
+#### Using Sessions in Controllers
+
+Inject `Request` into any controller method to read or write session data:
+
+```python
+from starlette.requests import Request
+from starlette.responses import RedirectResponse
+from starspring import TemplateController, GetMapping, PostMapping, ModelAndView
+from starspring_security import BCryptPasswordEncoder
+
+encoder = BCryptPasswordEncoder()
+
+@TemplateController("")
+class AuthController:
+    def __init__(self, user_service: UserService):
+        self.user_service = user_service
+
+    @PostMapping("/login")
+    async def login(self, form: LoginForm, request: Request):
+        user = await self.user_service.find_by_username(form.username)
+        if not user or not encoder.matches(form.password, user.password):
+            return ModelAndView("login.html", {"error": "Invalid credentials"}, status_code=401)
+
+        # Store user info in session
+        request.session["username"] = user.username
+        request.session["role"] = user.role
+        return RedirectResponse(url="/dashboard", status_code=302)
+
+    @GetMapping("/logout")
+    async def logout(self, request: Request):
+        request.session.clear()
+        return RedirectResponse(url="/login", status_code=302)
+
+    @GetMapping("/dashboard")
+    async def dashboard(self, request: Request):
+        if not request.session.get("username"):
+            return RedirectResponse(url="/login", status_code=302)
+        return ModelAndView("dashboard.html", {
+            "username": request.session["username"],
+            "role": request.session["role"],
+        })
+```
+
+#### Role-Based Authorization
+
+```python
+@GetMapping("/admin/users")
+async def admin_users(self, request: Request):
+    if not request.session.get("username"):
+        return RedirectResponse(url="/login", status_code=302)
+    if request.session.get("role") != "ADMIN":
+        return RedirectResponse(url="/dashboard", status_code=302)  # Forbidden
+    # ... admin logic
+```
+
+#### `application.yaml` Configuration
+
+```yaml
+server:
+  host: "0.0.0.0"
+  port: 8000
+
+database:
+  url: "sqlite:///app.db"
+  ddl-auto: "create-if-not-exists"
+```
+
+> **Note:** Keep your `secret_key` secret and never commit it to version control. Use environment variables in production.
+
+---
+
 ## Advanced Features
 
 ### Lifecycle Hooks
@@ -809,9 +966,9 @@ class PostRepository(StarRepository[Post]):
 
 Complete examples are available in the `examples/` directory:
 
-- **examples/test1**: Basic CRUD API with users
-- **examples/blog**: Blog application with templates
-- **examples/microservice**: Microservice architecture example
+- **examples/example1**: Basic CRUD API with users
+- **examples/example2**: Blog application with templates and form handling
+- **examples/example3**: Session-based authentication with role-based authorization and Bootstrap 5 UI
 
 ---
 

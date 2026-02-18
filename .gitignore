@@ -53,3 +53,6 @@ local_settings.py
 # Example app databases
 examples/**/app.db
 examples/**/*.sqlite
+
+# Separate packages (not part of this repo)
+starspring-security/
