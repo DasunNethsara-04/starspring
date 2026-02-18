@@ -73,7 +73,7 @@ from starspring.config.environment import Environment
 # Client
 from starspring.client.rest_client import RestTemplate
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 __all__ = [
     # Application
