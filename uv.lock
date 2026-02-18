@@ -2,6 +2,12 @@ version = 1
 revision = 3
 requires-python = ">=3.10"
 
+[manifest]
+members = [
+    "example2",
+    "starspring",
+]
+
 [[package]]
 name = "aiomysql"
 version = "0.3.2"
@@ -490,6 +496,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/f5/22/900cb125c76b7aaa4
 wheels = [
     { url = "https://files.pythonhosted.org/packages/de/15/545e2b6cf2e3be84bc1ed85613edd75b8aea69807a71c26f4ca6a9258e82/email_validator-2.3.0-py3-none-any.whl", hash = "sha256:80f13f623413e6b197ae73bb10bf4eb0908faf509ad8362c5edeb0be7fd450b4", size = 35604, upload-time = "2025-08-26T13:09:05.858Z" },
 ]
+
+[[package]]
+name = "example2"
+version = "0.1.0"
+source = { virtual = "examples/example2" }
+dependencies = [
+    { name = "starspring" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "starspring", editable = "." }]
 
 [[package]]
 name = "exceptiongroup"
