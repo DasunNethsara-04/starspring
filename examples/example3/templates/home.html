@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+
+{% block title %}StarSpring Auth — Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row justify-content-center text-center py-5">
+    <div class="col-md-8">
+        <i class="bi bi-stars text-primary" style="font-size: 4rem;"></i>
+        <h1 class="display-4 fw-bold mt-3">StarSpring Auth</h1>
+        <p class="lead text-muted mb-4">
+            A demonstration of session-based authentication and role-based authorization
+            built with the <strong>StarSpring</strong> framework.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/register" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-person-plus me-2"></i> Get Started
+            </a>
+            <a href="/login" class="btn btn-outline-secondary btn-lg px-4">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+            </a>
+        </div>
+    </div>
+</div>
+
+<hr class="my-4">
+
+<!-- Features -->
+<div class="row g-4 py-3">
+    <div class="col-md-4">
+        <div class="card p-4 h-100 text-center">
+            <i class="bi bi-shield-lock text-primary mb-3" style="font-size: 2.5rem;"></i>
+            <h5 class="fw-bold">Session Authentication</h5>
+            <p class="text-muted small">
+                Secure session-based login using signed cookies powered by
+                <code>itsdangerous</code>. Sessions are tamper-proof.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 h-100 text-center">
+            <i class="bi bi-person-badge text-success mb-3" style="font-size: 2.5rem;"></i>
+            <h5 class="fw-bold">Role-Based Authorization</h5>
+            <p class="text-muted small">
+                Users are assigned <span class="badge bg-primary">USER</span> or
+                <span class="badge bg-danger">ADMIN</span> roles.
+                Admin routes are protected and inaccessible to regular users.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 h-100 text-center">
+            <i class="bi bi-lock-fill text-warning mb-3" style="font-size: 2.5rem;"></i>
+            <h5 class="fw-bold">Secure Passwords</h5>
+            <p class="text-muted small">
+                Passwords are hashed with <strong>SHA-256</strong> before being stored.
+                Plain-text passwords are never saved to the database.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- How it works -->
+<div class="row mt-5">
+    <div class="col">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-4"><i class="bi bi-diagram-3 me-2 text-primary"></i>How It Works</h5>
+            <div class="row g-3 text-center">
+                <div class="col-md-3">
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2" style="width:48px;height:48px;font-weight:700;">1</div>
+                    <p class="small fw-semibold mb-0">Register</p>
+                    <p class="text-muted small">Create an account with username, email & password</p>
+                </div>
+                <div class="col-md-3">
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2" style="width:48px;height:48px;font-weight:700;">2</div>
+                    <p class="small fw-semibold mb-0">Login</p>
+                    <p class="text-muted small">Credentials are verified and a session is created</p>
+                </div>
+                <div class="col-md-3">
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2" style="width:48px;height:48px;font-weight:700;">3</div>
+                    <p class="small fw-semibold mb-0">Dashboard</p>
+                    <p class="text-muted small">Access your personal dashboard with session data</p>
+                </div>
+                <div class="col-md-3">
+                    <div class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center mb-2" style="width:48px;height:48px;font-weight:700;">4</div>
+                    <p class="small fw-semibold mb-0">Admin Panel</p>
+                    <p class="text-muted small">ADMIN users can manage all registered users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

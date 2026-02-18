@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard — StarSpring Auth{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="fw-bold">
+            <i class="bi bi-speedometer2 me-2 text-primary"></i> Dashboard
+        </h2>
+        <p class="text-muted">Welcome back, <strong>{{ username }}</strong>!</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Profile Card -->
+    <div class="col-md-4">
+        <div class="card p-4 text-center h-100">
+            <div class="mb-3">
+                <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
+            </div>
+            <h5 class="fw-bold">{{ username }}</h5>
+            <span class="badge {% if role == 'ADMIN' %}bg-danger{% else %}bg-primary{% endif %} mb-3">
+                {{ role }}
+            </span>
+            <p class="text-muted small">You are logged in with a session-based authentication system powered by StarSpring.</p>
+        </div>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="col-md-8">
+        <div class="row g-3">
+            <div class="col-sm-6">
+                <div class="card p-3 h-100 border-start border-primary border-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-shield-check fs-2 text-primary"></i>
+                        <div>
+                            <div class="text-muted small">Authentication</div>
+                            <div class="fw-bold">Session-Based</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card p-3 h-100 border-start border-success border-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-lock-fill fs-2 text-success"></i>
+                        <div>
+                            <div class="text-muted small">Password</div>
+                            <div class="fw-bold">SHA-256 Hashed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card p-3 h-100 border-start border-warning border-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-person-badge fs-2 text-warning"></i>
+                        <div>
+                            <div class="text-muted small">Your Role</div>
+                            <div class="fw-bold">{{ role }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card p-3 h-100 border-start border-info border-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-stars fs-2 text-info"></i>
+                        <div>
+                            <div class="text-muted small">Framework</div>
+                            <div class="fw-bold">StarSpring</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if role == "ADMIN" %}
+<div class="row mt-4">
+    <div class="col">
+        <div class="card p-4 bg-danger bg-opacity-10 border-danger border">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="fw-bold text-danger mb-1">
+                        <i class="bi bi-shield-lock me-2"></i>Admin Panel
+                    </h5>
+                    <p class="text-muted mb-0">You have admin privileges. Manage all users from the admin panel.</p>
+                </div>
+                <a href="/admin/users" class="btn btn-danger">
+                    <i class="bi bi-people me-1"></i> Manage Users
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

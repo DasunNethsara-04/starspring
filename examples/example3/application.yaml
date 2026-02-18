@@ -1,0 +1,12 @@
+database:
+  url: "sqlite:///app.db"
+  ddl-auto: "create-if-not-exists"
+
+server:
+  port: 8000
+  host: "0.0.0.0"
+
+middleware:
+  session:
+    enabled: true
+    secret_key: "my-secret-key"
