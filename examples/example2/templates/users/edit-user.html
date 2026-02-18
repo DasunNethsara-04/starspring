@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}UMS - Edit User{% endblock %}
+
+{% block content %}
+<h1 class="display-6">Edit User: {{ user.name }}</h1>
+
+{% if message %}
+{% if success %}
+<div class="alert alert-success" role="alert">
+    {{ message }}
+</div>
+{% else %}
+<div class="alert alert-danger" role="alert">
+    {{ message }}
+</div>
+{% endif %}
+{% endif %}
+
+<div class="container">
+    <form action="/users/{{ user.id }}/edit" method="POST">
+        <!-- Method override for PUT -->
+        <input type="hidden" name="_method" value="PUT">
+        
+        <div class="mb-3">
+            <label for="exampleInputName1" class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" id="exampleInputName1" value="{{ user.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email address</label>
+            <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                   value="{{ user.email }}" required>
+            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputAge1" class="form-label">Age</label>
+            <input type="number" name="age" class="form-control" id="exampleInputAge1" value="{{ user.age }}" required>
+        </div>
+        <button type="submit" class="btn btn-warning">Update</button>
+    </form>
+</div>
+
+{% endblock %}

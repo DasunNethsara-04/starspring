@@ -1,0 +1,7 @@
+database:
+  url: "sqlite:///app.db"
+  ddl-auto: "create-if-not-exists"
+
+server:
+  port: 8000
+  host: "0.0.0.0"
