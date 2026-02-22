@@ -98,17 +98,17 @@ from sqlalchemy.types import TypeEngine
 # Global registry for imperative mapping
 mapper_registry = SARegistry()
 
-def _get_sa_type(py_type: Type) -> TypeEngine:
+def _get_sa_type(py_type: Type, length: Optional[int] = None) -> TypeEngine:
     """Convert Python type to SQLAlchemy type"""
     if py_type == int:
         return Integer
     elif py_type == str:
-        return String
+        return String(length or 255)
     elif py_type == bool:
         return Boolean
     elif py_type == datetime:
         return DateTime
-    return String  # Default fallback
+    return String(length or 255)  # Default fallback
 
 def Entity(table_name: Optional[str] = None):
     """
@@ -161,7 +161,7 @@ def Entity(table_name: Optional[str] = None):
                         # Create SQLAlchemy Column
                         sa_col_args = [
                             field_value.name,
-                            _get_sa_type(field_value.type)
+                            _get_sa_type(field_value.type, field_value.length)
                         ]
                         
                         sa_col_kwargs = {
@@ -209,7 +209,7 @@ def Entity(table_name: Optional[str] = None):
                 # Create SQLAlchemy Column
                 sa_col_args = [
                     field_value.name,
-                    _get_sa_type(field_value.type)
+                    _get_sa_type(field_value.type, field_value.length)
                 ]
                 
                 sa_col_kwargs = {
