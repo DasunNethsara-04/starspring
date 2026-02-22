@@ -135,8 +135,7 @@ class Repository(Generic[T]):
         Returns:
             Number of entities
         """
-        entities = await self.find_all()
-        return len(entities)
+        return await self._gateway.count(self.entity_class)
 
 
 class CrudRepository(Repository[T]):
