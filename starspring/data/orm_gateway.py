@@ -49,6 +49,11 @@ class ORMGateway(ABC, Generic[T]):
         pass
     
     @abstractmethod
+    async def count(self, entity_class: Type[T]) -> int:
+        """Count total number of entities"""
+        pass
+    
+    @abstractmethod
     async def execute_query(self, sql: str, params: dict, entity_class: Type[T], operation: str) -> Any:
         """
         Execute a custom SQL query
@@ -152,6 +157,13 @@ class SQLAlchemyGateway(ORMGateway[T]):
         """Check if an entity exists using SQLAlchemy ORM"""
         obj = self.session.get(entity_class, id)
         return obj is not None
+
+    async def count(self, entity_class: Type[T]) -> int:
+        """Count total number of entities using SQLAlchemy func.count()"""
+        from sqlalchemy import select, func
+        stmt = select(func.count()).select_from(entity_class)
+        result = self.session.execute(stmt)
+        return result.scalar() or 0
     
     async def execute_query(self, sql: str, params: dict, entity_class: Type[T], operation: str) -> Any:
         """
