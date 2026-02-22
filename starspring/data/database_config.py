@@ -29,25 +29,28 @@ class DatabaseConfig:
                 "SQLAlchemy is required for database support. "
                 "Install it with: pip install sqlalchemy"
             )
-        
+
         # Load configuration
         props = get_properties()
-        
+
         self.url = props.get("database.url")
         if not self.url:
             raise ValueError(
                 "Database URL not configured. "
                 "Add 'database.url' to application.yaml"
             )
-        
+
         self.pool_size = props.get_int("database.pool_size", 10)
         self.max_overflow = props.get_int("database.max_overflow", 20)
         self.echo = props.get_bool("database.echo", False)
         self.pool_pre_ping = props.get_bool("database.pool_pre_ping", True)
-        
+
+        # Auto-create the database schema if needed (MySQL/MariaDB only)
+        self._ensure_database_exists()
+
         # Create engine
         logger.info(f"Initializing database: {self._mask_password(self.url)}")
-        
+
         self.engine = create_engine(
             self.url,
             pool_size=self.pool_size,
@@ -55,11 +58,57 @@ class DatabaseConfig:
             echo=self.echo,
             pool_pre_ping=self.pool_pre_ping
         )
-        
+
         # Create session factory
         self.SessionFactory = sessionmaker(bind=self.engine)
-        
+
         logger.info("Database initialized successfully")
+
+    def _ensure_database_exists(self) -> None:
+        """
+        Auto-create the MySQL/MariaDB database if it does not exist.
+
+        Parses the database name from the URL, connects to the MySQL server
+        without selecting a database, and issues CREATE DATABASE IF NOT EXISTS.
+        This is a no-op for SQLite and PostgreSQL.
+        """
+        # Only applies to MySQL / MariaDB dialects
+        if not self.url.startswith(("mysql", "mariadb")):
+            return
+
+        try:
+            from sqlalchemy import create_engine, text
+            from sqlalchemy.engine import make_url
+
+            parsed = make_url(self.url)
+            db_name = parsed.database
+            if not db_name:
+                return
+
+            # Build the root URL manually from individual components so we
+            # guarantee no database name leaks through (set(database=None)
+            # is unreliable with some pymysql versions).
+            driver = parsed.drivername          # e.g. mysql+pymysql
+            user = parsed.username or "root"
+            password = parsed.password or ""
+            host = parsed.host or "localhost"
+            port = parsed.port or 3306
+            root_url = f"{driver}://{user}:{password}@{host}:{port}/"
+
+            root_engine = create_engine(root_url, pool_pre_ping=False)
+            with root_engine.connect() as conn:
+                conn.execute(
+                    text(f"CREATE DATABASE IF NOT EXISTS `{db_name}` "
+                         f"CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+                )
+            root_engine.dispose()
+
+            logger.info(f"Database '{db_name}' is ready (created if not existed)")
+
+        except Exception as e:
+            # Non-fatal — the main engine creation will surface a clearer error
+            logger.warning(f"Could not auto-create database: {e}")
+
     
     def _mask_password(self, url: str) -> str:
         """Mask password in database URL for logging"""
