@@ -18,6 +18,7 @@ from starspring.core.exceptions import (
     BadRequestException,
     UnauthorizedException,
     ForbiddenException,
+    ConflictException,
     ValidationException,
     InternalServerException
 )
@@ -93,6 +94,7 @@ __all__ = [
     'BadRequestException',
     'UnauthorizedException',
     'ForbiddenException',
+    'ConflictException',
     'ValidationException',
     'InternalServerException',
     
