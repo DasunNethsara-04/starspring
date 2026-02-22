@@ -4,7 +4,7 @@ Entity decorators and base classes for ORM
 Provides Spring Boot-style entity annotations for database models.
 """
 
-from typing import Any, Optional, Type, TypeVar, List, get_type_hints
+from typing import Any, Optional, Type, TypeVar, List, get_type_hints, Tuple
 from datetime import datetime
 from enum import Enum
 import inspect
@@ -33,7 +33,8 @@ class ColumnMetadata:
         default: Any = None,
         length: Optional[int] = None,
         primary_key: bool = False,
-        auto_increment: bool = False
+        auto_increment: bool = False,
+        index: bool = False
     ):
         self.name = name
         self.type = type
@@ -43,6 +44,21 @@ class ColumnMetadata:
         self.length = length
         self.primary_key = primary_key
         self.auto_increment = auto_increment
+        self.index = index
+
+
+class IndexMetadata:
+    """Metadata for a named/composite table index"""
+
+    def __init__(
+        self,
+        columns: List[str],
+        name: Optional[str] = None,
+        unique: bool = False
+    ):
+        self.columns = columns
+        self.name = name
+        self.unique = unique
 
 
 class RelationshipMetadata:
@@ -71,11 +87,12 @@ class EntityMetadata:
         self.columns: dict[str, ColumnMetadata] = {}
         self.relationships: dict[str, RelationshipMetadata] = {}
         self.primary_key: Optional[str] = None
+        self.indexes: List[IndexMetadata] = []
 
 
 # SQLAlchemy integration
 from sqlalchemy.orm import registry as SARegistry
-from sqlalchemy import Table, Column as SAColumn, Integer, String, Boolean, DateTime, MetaData, ForeignKey
+from sqlalchemy import Table, Column as SAColumn, Integer, String, Boolean, DateTime, MetaData, ForeignKey, Index as SAIndex
 from sqlalchemy.types import TypeEngine
 
 # Global registry for imperative mapping
@@ -113,6 +130,12 @@ def Entity(table_name: Optional[str] = None):
         metadata = EntityMetadata(final_table_name)
         cls._entity_metadata = metadata  # type: ignore
         cls._is_entity = True  # type: ignore
+
+        # Collect composite index declarations from _indexes_ class attribute
+        if hasattr(cls, '_indexes_') and isinstance(cls._indexes_, list):
+            cls._entity_indexes = [
+                idx for idx in cls._indexes_ if isinstance(idx, IndexMetadata)
+            ]
         
         # Columns list for SQLAlchemy Table
         sa_columns = []
@@ -144,7 +167,8 @@ def Entity(table_name: Optional[str] = None):
                         sa_col_kwargs = {
                             'nullable': field_value.nullable,
                             'unique': field_value.unique,
-                            'primary_key': field_value.primary_key
+                            'primary_key': field_value.primary_key,
+                            'index': field_value.index
                         }
                         
                         if field_value.auto_increment:
@@ -191,7 +215,8 @@ def Entity(table_name: Optional[str] = None):
                 sa_col_kwargs = {
                     'nullable': field_value.nullable,
                     'unique': field_value.unique,
-                    'primary_key': field_value.primary_key
+                    'primary_key': field_value.primary_key,
+                    'index': field_value.index
                 }
                 
                 if field_value.auto_increment:
@@ -208,7 +233,24 @@ def Entity(table_name: Optional[str] = None):
         try:
             # We map strictly if not already mapped.
             # Using imperative mapping pattern.
-            table = Table(final_table_name, mapper_registry.metadata, *sa_columns, extend_existing=True)
+
+            # Build composite index objects declared via @Index on the class
+            sa_indexes = []
+            if hasattr(cls, '_entity_indexes'):
+                for idx_meta in cls._entity_indexes:
+                    idx_name = idx_meta.name or f"ix_{final_table_name}_{'_'.join(idx_meta.columns)}"
+                    sa_indexes.append(
+                        SAIndex(idx_name, *idx_meta.columns, unique=idx_meta.unique)
+                    )
+                    metadata.indexes.append(idx_meta)
+
+            table = Table(
+                final_table_name,
+                mapper_registry.metadata,
+                *sa_columns,
+                *sa_indexes,
+                extend_existing=True
+            )
             mapper_registry.map_imperatively(cls, table)
         except Exception:
             # If mapping fails (e.g. already mapped), we ignore for now or log
@@ -225,7 +267,8 @@ def Column(
     nullable: bool = True,
     unique: bool = False,
     default: Any = None,
-    length: Optional[int] = None
+    length: Optional[int] = None,
+    index: bool = False
 ):
     """
     Define a database column
@@ -239,9 +282,10 @@ def Column(
         unique: Whether column must be unique
         default: Default value
         length: Maximum length for string columns
+        index: Whether to create a single-column index on this field
         
     Example:
-        @Column(name="email_address", unique=True, nullable=False)
+        @Column(name="email_address", unique=True, nullable=False, index=True)
         email: str
     """
     return ColumnMetadata(
@@ -250,8 +294,40 @@ def Column(
         nullable=nullable,
         unique=unique,
         default=default,
-        length=length
+        length=length,
+        index=index
     )
+
+
+def Index(
+    *columns: str,
+    name: Optional[str] = None,
+    unique: bool = False
+) -> IndexMetadata:
+    """
+    Define a named or composite table index.
+
+    Use this as a class-level attribute on an @Entity class to create
+    multi-column or named indexes that cannot be expressed on a single @Column.
+
+    Args:
+        *columns: Column names to include in the index
+        name: Optional explicit index name (auto-generated if omitted)
+        unique: Whether the index enforces uniqueness
+
+    Example:
+        @Entity()
+        class Product(BaseEntity):
+            _indexes_ = [
+                Index("category", "price"),                    # composite
+                Index("sku", name="ix_product_sku", unique=True),  # named unique
+            ]
+
+            category: str = Column(nullable=False)
+            price: float = Column(nullable=False)
+            sku: str = Column(nullable=False)
+    """
+    return IndexMetadata(columns=list(columns), name=name, unique=unique)
 
 
 def Id():

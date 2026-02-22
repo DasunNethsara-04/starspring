@@ -57,7 +57,8 @@ from starspring.data.entity import (
     OneToMany,
     ManyToMany,
     BaseEntity,
-    GenerationType
+    GenerationType,
+    Index
 )
 from starspring.data.transaction import Transactional
 
@@ -80,14 +81,14 @@ __all__ = [
     # Application
     'StarSpringApplication',
     'create_application',
-    
+
     # Core
     'ApplicationContext',
     'BeanScope',
     'BaseController',
     'ResponseEntity',
     'ApiResponse',
-    
+
     # Exceptions
     'StarSpringException',
     'NotFoundException',
@@ -97,7 +98,7 @@ __all__ = [
     'ConflictException',
     'ValidationException',
     'InternalServerException',
-    
+
     # Component decorators
     'Controller',
     'TemplateController',
@@ -105,7 +106,7 @@ __all__ = [
     'Component',
     'Repository',
     'Autowired',
-    
+
     # Routing decorators
     'GetMapping',
     'PostMapping',
@@ -113,12 +114,12 @@ __all__ = [
     'DeleteMapping',
     'PatchMapping',
     'RequestMapping',
-    
+
     # Configuration decorators
     'Configuration',
     'Bean',
     'Value',
-    
+
     # Data layer
     'RepositoryBase',
     'CrudRepository',
@@ -132,6 +133,7 @@ __all__ = [
     'ManyToMany',
     'BaseEntity',
     'GenerationType',
+    'Index',
     'Transactional',
     
     # Template engine
