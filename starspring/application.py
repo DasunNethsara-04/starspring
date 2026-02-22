@@ -258,13 +258,13 @@ class StarSpringApplication:
                 # Import the module
                 module = importlib.import_module(module_path)
                 self._scanned_modules.append(module)  # Track module
-                print(f"DEBUG: Scanning module {module_path}")
-                print(f"DEBUG: Current beans: {list(self.context._beans.keys())}")
+                logger.debug(f"Scanning module: {module_path}")
+                logger.debug(f"Registered beans: {list(self.context._beans.keys())}")
                 
                 # Scan for controllers and register routes
                 for name, obj in inspect.getmembers(module, inspect.isclass):
                     if hasattr(obj, '_is_controller'):
-                        print(f"DEBUG: Found controller: {name}")
+                        logger.debug(f"Found controller: {name}")
                         self._register_controller(obj)
                 
                 # If it's a package, scan submodules
@@ -280,7 +280,7 @@ class StarSpringApplication:
                                 self._register_controller(obj)
             
             except ImportError as e:
-                print(f"Warning: Could not import module {module_path}: {e}")
+                logger.warning(f"Could not import module '{module_path}': {e}")
         
         # Auto-create database tables from entities
         self._auto_create_tables_if_enabled()
@@ -346,7 +346,7 @@ class StarSpringApplication:
                     methods=methods
                 )
                 self._routes.append(route)
-                print(f"DEBUG: Registered route: {full_path} -> {methods}")
+                logger.debug(f"Registered route: {methods} {full_path}")
     
     def add_static_files(
         self,
